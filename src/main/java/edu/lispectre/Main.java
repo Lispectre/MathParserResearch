@@ -1,7 +1,10 @@
 package edu.lispectre;
 
+import java.util.ArrayList;
+
 public class Main {
     public static void main(String[] args) {
-        Parser.parseEquation("123*(444-2/(88.3+3))+4.56");
+        ArrayList<Token> tokens = Tokenizer.tokenizeEquation("123*56--45/21");
+        Token token = Parser.parseEquationTokens(tokens);
     }
 }

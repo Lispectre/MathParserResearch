@@ -9,9 +9,12 @@ public abstract class Token {
     public abstract Float eval();
 }
 
-// TODO: Tokens for parentheses.
 
 class OperatorToken extends Token {
+
+    OperatorToken(Operator op){
+        this.operator = op;
+    }
     OperatorToken(Operator op, Token left, Token right){
         this.operator = op;
         this.left = left;
@@ -25,7 +28,6 @@ class OperatorToken extends Token {
             case DIVISION -> this.val = left.eval() / right.eval();
             case MULTIPLICATION -> this.val = left.eval() * right.eval();
         }
-
         return this.val;
     }
 }
@@ -52,4 +54,6 @@ class VariableToken extends Token {
     public Float eval() {
         return null;
     }
+
+
 }
