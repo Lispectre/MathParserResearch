@@ -5,28 +5,35 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Tokenizer {
-    private static final Pattern tokenizingRegEx = Pattern.compile("-?\\d*\\.?\\d+|[a-zA-Z]+|[+\\-*/]|\\(|\\)");
-    private static final Pattern isNumericRegEx = Pattern.compile("-?\\d*\\.?\\d+");
-    private static final Pattern nestedEquationRegEx = Pattern.compile("\\((.*)");
+    private static final Pattern tokenizingRegEx = Pattern.compile("\\d*\\.?\\d+|[a-zA-Z]+|[\\^+\\-*/]|\\(|\\)");
+    private static final Pattern isNumericRegEx = Pattern.compile("\\d*\\.?\\d+");
+    private static final Pattern nestedEquationRegEx = Pattern.compile("\\([^)]*\\)");
+
 
     public static ArrayList<Token> tokenizeEquation(String equation){
         final Matcher matcher = tokenizingRegEx.matcher(equation);
+        final Matcher nestedMatcher = nestedEquationRegEx.matcher(equation);
+
         final ArrayList<String> matches = new ArrayList<>();
         final ArrayList<Token> naiveTokens = new ArrayList<>();
         while (matcher.find()) {
             String match = matcher.group();
             matches.add(match);
         }
-        for (String symbol : matches){
+        for (int index = 0; index < matches.size(); index++){
+            String symbol = matches.get(index);
             Token token;
             switch (symbol){
                 case "(":
-                    Matcher nestedMatcher = nestedEquationRegEx.matcher(equation);
                     if (!nestedMatcher.find()) {
                         throw new RuntimeException("Paren error.");
                     }
                     String nestedEquation = nestedEquation(nestedMatcher.group());
                     token = Parser.parseEquationTokens(tokenizeEquation(nestedEquation));
+                    index += movePointerAfterNestedEquation(matches, index+1);
+                    break;
+                case "^":
+                    token = new OperatorToken(Operator.EXPONENT);
                     break;
                 case "*":
                     token = new OperatorToken(Operator.MULTIPLICATION);
@@ -75,24 +82,19 @@ public class Tokenizer {
         }
         return nestedEquationBuilder.toString();
     }
-    private static int movePointerAfterNestedEquation(final ArrayList<String> matches) {
-        final int matchesAmount = matches.size();
-        int leftmostParenthesis = 0;
-        int rightmostParenthesis = 0;
+    private static int movePointerAfterNestedEquation(final ArrayList<String> matches, final int pointer) {
+        int unmatchedParenthesis = 1;
+        int i;
 
-        for (int i = 0; i<matchesAmount; i++){
-            if (matches.get(i).equals("(")) {
-                leftmostParenthesis = i;
-                break;
+        for (i = pointer; unmatchedParenthesis > 0; i++) {
+            String match = matches.get(i);
+            if (match.equals("(")) {
+                unmatchedParenthesis++;
+            }
+            if (match.equals(")")) {
+                unmatchedParenthesis--;
             }
         }
-        for (int i = matchesAmount-1; i>=0; i--){
-            if (matches.get(i).equals(")")) {
-                rightmostParenthesis = i;
-                break;
-            }
-        }
-
-        return rightmostParenthesis-leftmostParenthesis;
+        return i - pointer;
     }
 }

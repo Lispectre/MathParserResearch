@@ -1,8 +1,9 @@
 package edu.lispectre;
 
 public enum Operator {
-    ADDITION,
-    SUBTRACTION,
+    EXPONENT,
+    MULTIPLICATION,
     DIVISION,
-    MULTIPLICATION
+    ADDITION,
+    SUBTRACTION
 }
