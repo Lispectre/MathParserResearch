@@ -28,8 +28,9 @@ public class Tokenizer {
                     if (!nestedMatcher.find()) {
                         throw new RuntimeException("Paren error.");
                     }
-                    String nestedEquation = nestedEquation(nestedMatcher.group());
-                    token = Parser.parseEquationTokens(tokenizeEquation(nestedEquation));
+                    String nestedEquation = nestedEquation(matches, index);
+                    ArrayList<Token> tokenizedNestedEquation = tokenizeEquation(nestedEquation);
+                    token = Parser.parseEquationTokens(tokenizedNestedEquation);
                     index += movePointerAfterNestedEquation(matches, index+1);
                     break;
                 case "^":
@@ -62,22 +63,22 @@ public class Tokenizer {
         return naiveTokens;
     }
 
-    private static String nestedEquation(final String equation){
+    private static String nestedEquation(final ArrayList<String> matches, final int index){
         final StringBuilder nestedEquationBuilder = new StringBuilder();
-        int charPointer = 1;
+        int charPointer = index+1;
         for (int unmatchedParentheses = 1; unmatchedParentheses > 0;){
-            char c = equation.charAt(charPointer++);
-            if (c == ')'){
+            String symbol = matches.get(charPointer++);
+            if (symbol.equals(")")){
                 if (unmatchedParentheses > 1){
-                    nestedEquationBuilder.append(c);
+                    nestedEquationBuilder.append(symbol);
                 }
                 unmatchedParentheses--;
             }
             else {
-                if (c == '('){
+                if (symbol.equals("(")){
                     unmatchedParentheses++;
                 }
-                nestedEquationBuilder.append(c);
+                nestedEquationBuilder.append(symbol);
             }
         }
         return nestedEquationBuilder.toString();

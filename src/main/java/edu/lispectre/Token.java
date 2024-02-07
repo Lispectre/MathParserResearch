@@ -69,7 +69,7 @@ class ValueToken extends Token {
 }
 
 class VariableToken extends Token {
-    String variableIdentifier;
+    final String variableIdentifier;
     VariableToken(String variableIdentifier){
         this.variableIdentifier = variableIdentifier;
         this.type = TokenType.VARIABLE;

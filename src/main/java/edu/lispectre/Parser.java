@@ -1,11 +1,10 @@
 package edu.lispectre;
 
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 public class Parser {
-    // TODO: Implement parsing methods, return only the token which is the top node of the AST.
     public static Token parseEquationTokens(final ArrayList<Token> naiveTokens){
         // Base condition:
         if (naiveTokens.size() == 1){
@@ -19,6 +18,9 @@ public class Parser {
                     continue;
                 }
                 if (token.getType() != Token.TokenType.OPERATOR){
+                    continue;
+                }
+                if (token.left != null && token.right != null){
                     continue;
                 }
                 Precedence tokenPrecedence = switch (token.operator) {
@@ -39,12 +41,12 @@ public class Parser {
     }
 
     private static <T> ArrayList<T> getAndRemoveClosest(ArrayList<T> list, int index){
-        ArrayList<T> pairClosest = new ArrayList<>();
+        ArrayList<T> pairClosest = new ArrayList<>(Collections.nCopies(2, null));
 
         for (int i = index-1; i>=0; i--){
             T closestLeft = list.get(i);
             if (closestLeft != null){
-                pairClosest.add(closestLeft);
+                pairClosest.set(0, closestLeft);
                 list.set(i, null);
                 break;
             }
@@ -52,7 +54,7 @@ public class Parser {
         for (int i = index+1; i<list.size(); i++){
             T closestRight = list.get(i);
             if (closestRight != null){
-                pairClosest.add(closestRight);
+                pairClosest.set(1, closestRight);
                 list.set(i, null);
                 break;
             }
