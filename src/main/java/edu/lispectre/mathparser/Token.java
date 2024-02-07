@@ -1,25 +1,29 @@
-package edu.lispectre;
+package edu.lispectre.mathparser;
 
 public abstract class Token {
     Token left;
     Token right;
     Operator operator;
-    Float val;
+    Double val;
     TokenType type;
+
+
+    public abstract Double eval();
+
+    public abstract void changeVariable(Double val);
+
+    public TokenType getType() {
+        return this.type;
+    }
+
     public enum TokenType {
         OPERATOR,
         VALUE,
         VARIABLE
     }
-    public abstract Float eval();
-    public TokenType getType(){
-        return this.type;
-    }
 }
 
-
 class OperatorToken extends Token {
-
     OperatorToken(Operator op){
         this.operator = op;
         this.type = TokenType.OPERATOR;
@@ -31,9 +35,9 @@ class OperatorToken extends Token {
         this.type = TokenType.OPERATOR;
     }
 
-    public Float eval() {
+    public Double eval() {
         switch(operator){
-            case EXPONENT -> this.val = (float) Math.pow(left.eval(), right.eval());
+            case EXPONENT -> this.val = Math.pow(left.eval(), right.eval());
             case MULTIPLICATION -> this.val = left.eval() * right.eval();
             case DIVISION -> this.val = left.eval() / right.eval();
             case ADDITION -> this.val = left.eval() + right.eval();
@@ -42,44 +46,55 @@ class OperatorToken extends Token {
         return this.val;
     }
 
+    @Override
+    public void changeVariable(Double val) {
+        throw new RuntimeException("Something went horribly wrong if you see this error.");
+    }
 
     @Override
     public String toString(){
         String[] operators = {"^", "*", "/", "+", "-"};
         return operators[this.operator.ordinal()];
     }
-
-
 }
 
 class ValueToken extends Token {
-    ValueToken(Float val){
+    ValueToken(Double val) {
         this.val = val;
         this.type = TokenType.VALUE;
     }
 
-    public Float eval() {
+    public Double eval() {
         return this.val;
     }
 
     @Override
+    public void changeVariable(Double val) {
+        throw new RuntimeException("Something went horribly wrong if you see this error.");
+    }
+
+    @Override
     public String toString(){
-        return Float.toString(this.val);
+        return Double.toString(this.val);
     }
 }
 
 class VariableToken extends Token {
     final String variableIdentifier;
+
     VariableToken(String variableIdentifier){
         this.variableIdentifier = variableIdentifier;
         this.type = TokenType.VARIABLE;
     }
 
-    void changeVariable(Float val){
-        this.val = val;
+
+    public Double eval() {
+        return this.val;
     }
-    public Float eval() {
-        return null;
+
+    @Override
+    public void changeVariable(Double val) {
+        this.val = val;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package edu.lispectre;
+package edu.lispectre.mathparser;
 
 public enum Operator {
     EXPONENT,

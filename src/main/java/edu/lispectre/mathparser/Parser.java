@@ -1,4 +1,4 @@
-package edu.lispectre;
+package edu.lispectre.mathparser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,6 +6,9 @@ import java.util.Objects;
 
 public class Parser {
     public static Token parseEquationTokens(final ArrayList<Token> naiveTokens){
+        if (naiveTokens.isEmpty()) {
+            throw new RuntimeException("Trying to parse an empty equation.");
+        }
         // Base condition:
         if (naiveTokens.size() == 1){
             return naiveTokens.getFirst();

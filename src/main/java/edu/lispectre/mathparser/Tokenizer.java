@@ -1,6 +1,8 @@
-package edu.lispectre;
+package edu.lispectre.mathparser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,31 +10,46 @@ public class Tokenizer {
     private static final Pattern tokenizingRegEx = Pattern.compile("\\d*\\.?\\d+|[a-zA-Z]+|[\\^+\\-*/]|\\(|\\)");
     private static final Pattern isNumericRegEx = Pattern.compile("\\d*\\.?\\d+");
     private static final Pattern nestedEquationRegEx = Pattern.compile("\\([^)]*\\)");
+    private final ArrayList<Token> unparsedTokens = new ArrayList<>();
+    private final HashMap<String, Token> variableAccess = new HashMap<>();
 
+    Tokenizer() {
+    }
 
-    public static ArrayList<Token> tokenizeEquation(String equation){
+    Tokenizer(String equation) {
+        tokenizeEquation(equation);
+    }
+
+    public void tokenizeEquation(String equation) {
         final Matcher matcher = tokenizingRegEx.matcher(equation);
         final Matcher nestedMatcher = nestedEquationRegEx.matcher(equation);
-
         final ArrayList<String> matches = new ArrayList<>();
-        final ArrayList<Token> naiveTokens = new ArrayList<>();
+
+        unparsedTokens.clear();
+        variableAccess.clear();
+
         while (matcher.find()) {
             String match = matcher.group();
             matches.add(match);
         }
+
         for (int index = 0; index < matches.size(); index++){
             String symbol = matches.get(index);
             Token token;
             switch (symbol){
                 case "(":
                     if (!nestedMatcher.find()) {
-                        throw new RuntimeException("Paren error.");
+                        throw new RuntimeException("Parentheses error - unmatched open parenthesis.");
                     }
                     String nestedEquation = nestedEquation(matches, index);
-                    ArrayList<Token> tokenizedNestedEquation = tokenizeEquation(nestedEquation);
-                    token = Parser.parseEquationTokens(tokenizedNestedEquation);
+                    Tokenizer nestedEquationTokenizer = new Tokenizer(nestedEquation);
+                    ArrayList<Token> nestedEquationTokens = nestedEquationTokenizer.getTokens();
+                    this.variableAccess.putAll(nestedEquationTokenizer.getVariables());
+                    token = Parser.parseEquationTokens(nestedEquationTokens);
                     index += movePointerAfterNestedEquation(matches, index+1);
                     break;
+                case ")":
+                    throw new RuntimeException("Parentheses error - unmatched closing parenthesis.");
                 case "^":
                     token = new OperatorToken(Operator.EXPONENT);
                     break;
@@ -50,17 +67,43 @@ public class Tokenizer {
                     break;
                 default:
                     if (isNumericRegEx.matcher(symbol).matches()){
-                        token = new ValueToken(Float.parseFloat(symbol));
+                        token = new ValueToken(Double.parseDouble(symbol));
                     }
                     else {
-                        token = new VariableToken(symbol);
+                        if (!variableAccess.containsKey(symbol)) {
+                            // One that already exists?
+                            token = new VariableToken(symbol);
+                            variableAccess.put(symbol, token);
+                        } else {
+                            token = variableAccess.get(symbol);
+                        }
+
                     }
                     break;
-
             }
-            naiveTokens.add(token);
+            unparsedTokens.add(token);
         }
-        return naiveTokens;
+    }
+
+    public HashMap<String, Token> getVariables() {
+        return variableAccess;
+    }
+
+    public void setVariable(String identifier, double value) {
+        variableAccess.get(identifier).changeVariable(value);
+    }
+
+    public void setVariables(String[] identifiers, double[] values) {
+        if (identifiers.length != values.length) {
+            throw new InputMismatchException("The amount of variable identifiers and values does not match.");
+        }
+        for (int i = 0; i < identifiers.length; i++) {
+            this.setVariable(identifiers[i], values[i]);
+        }
+    }
+
+    public ArrayList<Token> getTokens() {
+        return unparsedTokens;
     }
 
     private static String nestedEquation(final ArrayList<String> matches, final int index){
