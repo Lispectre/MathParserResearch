@@ -1,5 +1,6 @@
 package edu.lispectre.metaphrase;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -31,7 +32,7 @@ public class Main {
                     continue;
                 }
                 int numberOfEq = Integer.parseInt(matcher.group());
-                Benchmark.startBenchmark(numberOfEq, true);
+                Benchmark.startBenchmark(numberOfEq, false);
                 continue;
             }
             if (input.isEmpty()) continue;
@@ -40,8 +41,8 @@ public class Main {
             if (!variables.isEmpty()) {
                 for (Map.Entry<String, Token> variable : variables.entrySet()) {
                     System.out.print("Value of " + variable.getKey() + ": ");
-                    double value = in.nextDouble();
-                    tokenizer.changeValueOfVariable(variable.getKey(), value);
+                    String value = in.nextLine();
+                    tokenizer.changeValueOfVariable(variable.getKey(), new BigDecimal(value));
                 }
                 in.nextLine();
             }

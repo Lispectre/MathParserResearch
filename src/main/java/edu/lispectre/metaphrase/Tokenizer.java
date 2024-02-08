@@ -1,5 +1,6 @@
 package edu.lispectre.metaphrase;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -138,7 +139,7 @@ public class Tokenizer {
                     break;
                 default:
                     if (isNumericRegEx.matcher(symbol).matches()){
-                        token = new ValueToken(Double.parseDouble(symbol));
+                        token = new ValueToken(symbol);
                     }
                     else {
                         if (!variableAccess.containsKey(symbol)) {
@@ -168,8 +169,8 @@ public class Tokenizer {
     /**
      * Returns a {@code HashMap} of {@code VariableToken}s.
      * The keys are their corresponding identifiers in the equation. This method shouldn't be used for changing values
-     * of vars; it is better to use it as a way of retrieving identifiers and then using the {@link #changeValueOfVariable(String, double)}
-     * or {@link #changeValuesOfVariables(String[], double[])} methods.
+     * of vars; it is better to use it as a way of retrieving identifiers and then using the {@link #changeValueOfVariable(String, BigDecimal)}
+     * or {@link #changeValuesOfVariables(String[], BigDecimal[])} methods.
      *
      * @return a {@code HashMap} of variables that exist as tokens in this Tokenizer.
      */
@@ -185,13 +186,13 @@ public class Tokenizer {
      * @param value      the value which the variable should be assigned
      * @throws NullPointerException if trying to change value of a non-existent variable
      */
-    public void changeValueOfVariable(String identifier, double value) {
+    public void changeValueOfVariable(String identifier, BigDecimal value) {
         variableAccess.get(identifier).changeValue(value);
     }
 
     /**
      * Changes the value of multiple variables.
-     * Calls {@link #changeValueOfVariable(String identifier, double value)} with all the Strings and doubles in pairs sourced from the
+     * Calls {@link #changeValueOfVariable(String identifier, BigDecimal value)} with all the Strings and doubles in pairs sourced from the
      * arrays passed to this method. In essence this method is a wrapper that iterates over provided arrays.
      * This method doesn't need to change all variables in an equation.
      *
@@ -200,7 +201,7 @@ public class Tokenizer {
      * @throws NullPointerException   if trying to change value of a non-existent variable
      * @throws InputMismatchException if the length of params doesn't match
      */
-    public void changeValuesOfVariables(String[] identifiers, double[] values) {
+    public void changeValuesOfVariables(String[] identifiers, BigDecimal[] values) {
         if (identifiers.length != values.length) {
             throw new InputMismatchException("The amount of variable identifiers and values does not match.");
         }

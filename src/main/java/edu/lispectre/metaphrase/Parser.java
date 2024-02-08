@@ -55,7 +55,7 @@ public class Parser {
 
     private static Token unaryMinus(ArrayList<Token> list, int index) {
         Token token = new OperatorToken(Operator.MULTIPLICATION,
-                new ValueToken(-1.0),
+                new ValueToken("-1.0"),
                 list.get(index + 1));
         list.remove(index + 1);
         return token;

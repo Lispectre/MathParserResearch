@@ -1,5 +1,6 @@
 package edu.lispectre.metaphrase;
 
+import java.math.BigDecimal;
 import java.util.Random;
 
 public class Benchmark {
@@ -7,12 +8,23 @@ public class Benchmark {
         long timeElapsed = 0;
         for (int i = 0; i < numOfEquations; i++) {
             String randomEquation = generateRandomEquation(0);
-            double result;
+            if (verbose) {
+                System.out.printf("%s%n", randomEquation);
+            }
+            BigDecimal result;
             long start = System.nanoTime();
-            result = Parser.parseTokens(new Tokenizer(randomEquation).getTokens()).eval();
+            try {
+                result = Parser.parseTokens(new Tokenizer(randomEquation).getTokens()).eval();
+            } catch (ArithmeticException ex) {
+                timeElapsed += System.nanoTime() - start;
+                if (verbose) {
+                    System.out.println("Stopped evaluation - division by zero.");
+                }
+                continue;
+            }
             timeElapsed += System.nanoTime() - start;
             if (verbose) {
-                System.out.printf("%s%n=%f%n", randomEquation, result);
+                System.out.printf("= %s%n", result);
             }
         }
         double convertedToSeconds = (double) timeElapsed / 1_000_000_000;
