@@ -27,13 +27,19 @@ public class Parser {
                     continue;
                 }
                 Precedence tokenPrecedence = switch (token.operator) {
+                    case UNARYMINUS -> Precedence.UNARY;
                     case EXPONENT -> Precedence.EXPONENT;
                     case MULTIPLICATION, DIVISION -> Precedence.MULDIV;
                     case ADDITION, SUBTRACTION -> Precedence.ADDSUB;
                 };
                 if (tokenPrecedence == op) {
-                    ArrayList<Token> neighboringTokens = getAndRemoveClosest(naiveTokens, i);
-                    Token parsedToken = new OperatorToken(token.operator, neighboringTokens.get(0), neighboringTokens.get(1));
+                    Token parsedToken;
+                    if (tokenPrecedence == Precedence.UNARY) {
+                        parsedToken = unaryMinus(naiveTokens, i);
+                    } else {
+                        ArrayList<Token> neighboringTokens = getAndRemoveClosest(naiveTokens, i);
+                        parsedToken = new OperatorToken(token.operator, neighboringTokens.get(0), neighboringTokens.get(1));
+                    }
                     naiveTokens.set(i, parsedToken);
                 }
             }
@@ -43,6 +49,13 @@ public class Parser {
         return parseEquationTokens(naiveTokens);
     }
 
+    private static Token unaryMinus(ArrayList<Token> list, int index) {
+        Token token = new OperatorToken(Operator.MULTIPLICATION,
+                new ValueToken(-1.0),
+                list.get(index + 1));
+        list.remove(index + 1);
+        return token;
+    }
     private static <T> ArrayList<T> getAndRemoveClosest(ArrayList<T> list, int index){
         ArrayList<T> pairClosest = new ArrayList<>(Collections.nCopies(2, null));
 
@@ -66,6 +79,7 @@ public class Parser {
     }
 
     private enum Precedence{
+        UNARY,
         EXPONENT,
         MULDIV,
         ADDSUB

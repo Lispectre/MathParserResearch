@@ -53,7 +53,7 @@ class OperatorToken extends Token {
 
     @Override
     public String toString(){
-        String[] operators = {"^", "*", "/", "+", "-"};
+        String[] operators = {"U-", "^", "*", "/", "+", "-"};
         return operators[this.operator.ordinal()];
     }
 }

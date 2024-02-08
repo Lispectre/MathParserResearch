@@ -35,7 +35,6 @@ class ParserTest {
 
     @Test
     void parseSubtractingNegativeNumber() {
-        // FIXME: Negative numbers
         tokenizer.tokenizeEquation(subtractingNegativeNumberEquation);
         assertEquals(12.0, parseEquationTokens(tokenizer.getTokens()).eval());
     }

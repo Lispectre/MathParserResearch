@@ -1,6 +1,7 @@
 package edu.lispectre.mathparser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.regex.Matcher;
@@ -10,6 +11,7 @@ public class Tokenizer {
     private static final Pattern tokenizingRegEx = Pattern.compile("\\d*\\.?\\d+|[a-zA-Z]+|[\\^+\\-*/]|\\(|\\)");
     private static final Pattern isNumericRegEx = Pattern.compile("\\d*\\.?\\d+");
     private static final Pattern nestedEquationRegEx = Pattern.compile("\\([^)]*\\)");
+    private static final ArrayList<String> operators = new ArrayList<>(Arrays.asList("+", "(", "-", "*", "/"));
     private final ArrayList<Token> unparsedTokens = new ArrayList<>();
     private final HashMap<String, Token> variableAccess = new HashMap<>();
 
@@ -63,7 +65,11 @@ public class Tokenizer {
                     token = new OperatorToken(Operator.ADDITION);
                     break;
                 case "-":
-                    token = new OperatorToken(Operator.SUBTRACTION);
+                    if (index == 0 || operators.contains(matches.get(index - 1))) {
+                        token = new OperatorToken(Operator.UNARYMINUS);
+                    } else {
+                        token = new OperatorToken(Operator.SUBTRACTION);
+                    }
                     break;
                 default:
                     if (isNumericRegEx.matcher(symbol).matches()){
@@ -71,13 +77,11 @@ public class Tokenizer {
                     }
                     else {
                         if (!variableAccess.containsKey(symbol)) {
-                            // One that already exists?
                             token = new VariableToken(symbol);
                             variableAccess.put(symbol, token);
                         } else {
                             token = variableAccess.get(symbol);
                         }
-
                     }
                     break;
             }
