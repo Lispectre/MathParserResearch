@@ -1,4 +1,4 @@
-package edu.lispectre.mathparser;
+package edu.lispectre.metaphrase;
 
 import java.util.ArrayList;
 import java.util.Arrays;

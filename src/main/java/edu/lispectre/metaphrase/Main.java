@@ -1,4 +1,4 @@
-package edu.lispectre.mathparser;
+package edu.lispectre.metaphrase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static edu.lispectre.mathparser.Parser.parseTokens;
+import static edu.lispectre.metaphrase.Parser.parseTokens;
 
 public class Main {
     public static void main(String[] args) {
@@ -31,7 +31,7 @@ public class Main {
                     continue;
                 }
                 int numberOfEq = Integer.parseInt(matcher.group());
-                Benchmark.startBenchmark(numberOfEq, false);
+                Benchmark.startBenchmark(numberOfEq, true);
                 continue;
             }
             if (input.isEmpty()) continue;

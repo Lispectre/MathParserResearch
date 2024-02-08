@@ -1,8 +1,8 @@
-package edu.lispectre.mathparser;
+package edu.lispectre.metaphrase;
 
 import org.junit.jupiter.api.Test;
 
-import static edu.lispectre.mathparser.Parser.parseTokens;
+import static edu.lispectre.metaphrase.Parser.parseTokens;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ParserTest {

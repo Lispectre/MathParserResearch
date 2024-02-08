@@ -1,4 +1,4 @@
-package edu.lispectre.mathparser;
+package edu.lispectre.metaphrase;
 
 public abstract class Token {
     Token left;
