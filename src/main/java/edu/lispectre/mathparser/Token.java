@@ -7,10 +7,9 @@ public abstract class Token {
     Double val;
     TokenType type;
 
-
     public abstract Double eval();
 
-    public abstract void changeVariable(Double val);
+    public abstract void changeValue(Double val);
 
     public TokenType getType() {
         return this.type;
@@ -47,10 +46,9 @@ class OperatorToken extends Token {
     }
 
     @Override
-    public void changeVariable(Double val) {
+    public void changeValue(Double val) {
         throw new RuntimeException("Something went horribly wrong if you see this error.");
     }
-
     @Override
     public String toString(){
         String[] operators = {"U-", "^", "*", "/", "+", "-"};
@@ -69,10 +67,9 @@ class ValueToken extends Token {
     }
 
     @Override
-    public void changeVariable(Double val) {
+    public void changeValue(Double val) {
         throw new RuntimeException("Something went horribly wrong if you see this error.");
     }
-
     @Override
     public String toString(){
         return Double.toString(this.val);
@@ -93,10 +90,9 @@ class VariableToken extends Token {
     }
 
     @Override
-    public void changeVariable(Double val) {
+    public void changeValue(Double val) {
         this.val = val;
     }
-
     @Override
     public String toString(){
         return this.variableIdentifier;

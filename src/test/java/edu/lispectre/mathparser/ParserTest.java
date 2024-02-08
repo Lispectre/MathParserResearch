@@ -2,7 +2,7 @@ package edu.lispectre.mathparser;
 
 import org.junit.jupiter.api.Test;
 
-import static edu.lispectre.mathparser.Parser.parseEquationTokens;
+import static edu.lispectre.mathparser.Parser.parseTokens;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ParserTest {
@@ -24,57 +24,57 @@ class ParserTest {
     @Test
     void parseSimple() {
         tokenizer.tokenizeEquation(simpleEquation);
-        assertEquals(0.0, parseEquationTokens(tokenizer.getTokens()).eval());
+        assertEquals(0.0, parseTokens(tokenizer.getTokens()).eval());
     }
 
     @Test
     void parseSimpleExponent(){
         tokenizer.tokenizeEquation(simpleExponentEquation);
-        assertEquals(25.0, parseEquationTokens(tokenizer.getTokens()).eval());
+        assertEquals(25.0, parseTokens(tokenizer.getTokens()).eval());
     }
 
     @Test
     void parseSubtractingNegativeNumber() {
         tokenizer.tokenizeEquation(subtractingNegativeNumberEquation);
-        assertEquals(12.0, parseEquationTokens(tokenizer.getTokens()).eval());
+        assertEquals(12.0, parseTokens(tokenizer.getTokens()).eval());
     }
     @Test
     void parseSimpleDecimals() {
         tokenizer.tokenizeEquation(simpleWithDecimalsEquation);
-        assertEquals(21.55, parseEquationTokens(tokenizer.getTokens()).eval(), 0.01);
+        assertEquals(21.55, parseTokens(tokenizer.getTokens()).eval(), 0.01);
     }
     @Test
     void parseDiffPrecedences(){
         tokenizer.tokenizeEquation(differentiatingPrecedencesEquation);
-        assertEquals(389.4, parseEquationTokens(tokenizer.getTokens()).eval());
+        assertEquals(389.4, parseTokens(tokenizer.getTokens()).eval());
     }
     @Test
     void parseParentheses(){
         tokenizer.tokenizeEquation(oneParenthesisEquation);
-        assertEquals(64.0, parseEquationTokens(tokenizer.getTokens()).eval());
+        assertEquals(64.0, parseTokens(tokenizer.getTokens()).eval());
     }
     @Test
     void parseMultipleParentheses(){
         tokenizer.tokenizeEquation(multipleParenthesesEquation);
-        assertEquals(0.527, parseEquationTokens(tokenizer.getTokens()).eval(), 0.001);
+        assertEquals(0.527, parseTokens(tokenizer.getTokens()).eval(), 0.001);
     }
     @Test
     void parseNestedParentheses() {
         tokenizer.tokenizeEquation(nestedParenthesesEquation);
-        assertEquals(-16.0, parseEquationTokens(tokenizer.getTokens()).eval());
+        assertEquals(-16.0, parseTokens(tokenizer.getTokens()).eval());
     }
 
     @Test
     void parseAReallyLongAndUnnecessarilyComplicatedEquation() {
         tokenizer.tokenizeEquation(aReallyLongAndUnnecessarilyComplicatedJustLikeThisVariableNameEquation);
-        assertEquals(-6255.1865, parseEquationTokens(tokenizer.getTokens()).eval(), 0.0001);
+        assertEquals(-6255.1865, parseTokens(tokenizer.getTokens()).eval(), 0.0001);
     }
 
     @Test
     void parseOneKnownVariable() {
         tokenizer.tokenizeEquation(oneVariableEquation);
-        tokenizer.setVariable("x", 2.0);
-        assertEquals(32.0, parseEquationTokens(tokenizer.getTokens()).eval());
+        tokenizer.changeValueOfVariable("x", 2.0);
+        assertEquals(32.0, parseTokens(tokenizer.getTokens()).eval());
     }
 
     @Test
@@ -85,8 +85,8 @@ class ParserTest {
 //        tokenizer.setVariable("z", 10.0f);
         String[] variables = {"x", "y", "z"};
         double[] values = {5.0, 2.3, 10.0};
-        tokenizer.setVariables(variables, values);
-        assertEquals(14.018, parseEquationTokens(tokenizer.getTokens()).eval(), 0.001);
+        tokenizer.changeValuesOfVariables(variables, values);
+        assertEquals(14.018, parseTokens(tokenizer.getTokens()).eval(), 0.001);
     }
 
     @Test
@@ -95,9 +95,9 @@ class ParserTest {
         final double[] preparedValues = {2.0};
         int valuesPointer = 0;
         for (String variable : tokenizer.getVariables().keySet()) {
-            tokenizer.setVariable(variable, preparedValues[valuesPointer++]);
+            tokenizer.changeValueOfVariable(variable, preparedValues[valuesPointer++]);
         }
-        assertEquals(32.0, parseEquationTokens(tokenizer.getTokens()).eval());
+        assertEquals(32.0, parseTokens(tokenizer.getTokens()).eval());
     }
 
     @Test
@@ -106,8 +106,8 @@ class ParserTest {
         final double[] preparedValues = {5.0, 2.3, 10.0};
         int valuesPointer = 0;
         for (String variable : tokenizer.getVariables().keySet()) {
-            tokenizer.setVariable(variable, preparedValues[valuesPointer++]);
+            tokenizer.changeValueOfVariable(variable, preparedValues[valuesPointer++]);
         }
-        assertEquals(14.018, parseEquationTokens(tokenizer.getTokens()).eval(), 0.001);
+        assertEquals(14.018, parseTokens(tokenizer.getTokens()).eval(), 0.001);
     }
 }

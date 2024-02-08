@@ -5,26 +5,26 @@ import java.util.Collections;
 import java.util.Objects;
 
 public class Parser {
-    public static Token parseEquationTokens(final ArrayList<Token> naiveTokens){
-        if (naiveTokens.isEmpty()) {
+    public static Token parseTokens(final ArrayList<Token> tokens) {
+        if (tokens.isEmpty()) {
             throw new RuntimeException("Trying to parse an empty equation.");
         }
         // Base condition:
-        if (naiveTokens.size() == 1){
-            return naiveTokens.getFirst();
+        if (tokens.size() == 1) {
+            return tokens.getFirst();
         }
 
         for (Precedence op : Precedence.values()){
-            for (int i = 0; i < naiveTokens.size(); i++) {
-                Token token = naiveTokens.get(i);
+            for (int i = 0; i < tokens.size(); i++) {
+                Token token = tokens.get(i);
                 if (token == null) {
-                    continue;
+                    continue;                                       // Token was consumed as operand.
                 }
                 if (token.getType() != Token.TokenType.OPERATOR){
-                    continue;
+                    continue;                                       // Token is a variable or a value.
                 }
                 if (token.left != null && token.right != null){
-                    continue;
+                    continue;                                       // Token already has operands.
                 }
                 Precedence tokenPrecedence = switch (token.operator) {
                     case UNARYMINUS -> Precedence.UNARY;
@@ -35,18 +35,22 @@ public class Parser {
                 if (tokenPrecedence == op) {
                     Token parsedToken;
                     if (tokenPrecedence == Precedence.UNARY) {
-                        parsedToken = unaryMinus(naiveTokens, i);
+                        /* This means the next token regardless of its type or value will become an operand
+                         * in a multiplication, along with a -1.0 value token. */
+                        parsedToken = unaryMinus(tokens, i);
                     } else {
-                        ArrayList<Token> neighboringTokens = getAndRemoveClosest(naiveTokens, i);
-                        parsedToken = new OperatorToken(token.operator, neighboringTokens.get(0), neighboringTokens.get(1));
+                        // This means the rightmost and leftmost tokens are this token's operands.
+                        ArrayList<Token> operands = getAndConsumeOperands(tokens, i);
+                        parsedToken = new OperatorToken(token.operator,
+                                operands.get(0),
+                                operands.get(1));
                     }
-                    naiveTokens.set(i, parsedToken);
+                    tokens.set(i, parsedToken);
                 }
             }
         }
-
-        naiveTokens.removeIf(Objects::isNull);
-        return parseEquationTokens(naiveTokens);
+        tokens.removeIf(Objects::isNull);
+        return parseTokens(tokens);
     }
 
     private static Token unaryMinus(ArrayList<Token> list, int index) {
@@ -56,7 +60,8 @@ public class Parser {
         list.remove(index + 1);
         return token;
     }
-    private static <T> ArrayList<T> getAndRemoveClosest(ArrayList<T> list, int index){
+
+    private static <T> ArrayList<T> getAndConsumeOperands(ArrayList<T> list, int index) {
         ArrayList<T> pairClosest = new ArrayList<>(Collections.nCopies(2, null));
 
         for (int i = index-1; i>=0; i--){
