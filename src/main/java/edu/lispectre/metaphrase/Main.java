@@ -46,7 +46,7 @@ public class Main {
                 }
                 in.nextLine();
             }
-            Token parsedEquation = parseTokens(tokenizer.getTokens());
+            Token parsedEquation = parseTokens(tokenizer.getTokens(), tokenizer.getMathContext());
             System.out.println("= " + parsedEquation.eval());
         }
     }

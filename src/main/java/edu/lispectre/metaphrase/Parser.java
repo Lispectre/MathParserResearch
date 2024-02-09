@@ -1,11 +1,13 @@
 package edu.lispectre.metaphrase;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
 
 public class Parser {
-    public static Token parseTokens(final ArrayList<Token> tokens) {
+    public static Token parseTokens(final ArrayList<Token> tokens, final MathContext mathContextFromTokenizer) {
         if (tokens.isEmpty()) {
             throw new RuntimeException("Trying to parse an empty equation.");
         }
@@ -37,26 +39,28 @@ public class Parser {
                     if (tokenPrecedence == Precedence.UNARY) {
                         /* This means the next token regardless of its type or value will become an operand
                          * in a multiplication, along with a -1.0 value token. */
-                        parsedToken = unaryMinus(tokens, i);
+                        parsedToken = unaryMinus(tokens, i, mathContextFromTokenizer);
                     } else {
                         // This means the rightmost and leftmost tokens are this token's operands.
                         ArrayList<Token> operands = getAndConsumeOperands(tokens, i);
                         parsedToken = new OperatorToken(token.operator,
                                 operands.get(0),
-                                operands.get(1));
+                                operands.get(1),
+                                mathContextFromTokenizer);
                     }
                     tokens.set(i, parsedToken);
                 }
             }
         }
         tokens.removeIf(Objects::isNull);
-        return parseTokens(tokens);
+        return parseTokens(tokens, mathContextFromTokenizer);
     }
 
-    private static Token unaryMinus(ArrayList<Token> list, int index) {
+    private static Token unaryMinus(ArrayList<Token> list, int index, MathContext mathContextFromTokenizer) {
         Token token = new OperatorToken(Operator.MULTIPLICATION,
-                new ValueToken("-1.0"),
-                list.get(index + 1));
+                new ValueToken(new BigDecimal("-1.0")),
+                list.get(index + 1),
+                mathContextFromTokenizer);
         list.remove(index + 1);
         return token;
     }

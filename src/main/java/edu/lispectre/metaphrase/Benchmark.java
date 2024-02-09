@@ -1,11 +1,13 @@
 package edu.lispectre.metaphrase;
 
+
 import java.math.BigDecimal;
 import java.util.Random;
 
 public class Benchmark {
     public static void startBenchmark(final int numOfEquations, final boolean verbose) {
         long timeElapsed = 0;
+        Tokenizer tokenizer = new Tokenizer();
         for (int i = 0; i < numOfEquations; i++) {
             String randomEquation = generateRandomEquation(0);
             if (verbose) {
@@ -14,7 +16,8 @@ public class Benchmark {
             BigDecimal result;
             long start = System.nanoTime();
             try {
-                result = Parser.parseTokens(new Tokenizer(randomEquation).getTokens()).eval();
+                tokenizer.tokenizeEquation(randomEquation);
+                result = Parser.parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval();
             } catch (ArithmeticException ex) {
                 timeElapsed += System.nanoTime() - start;
                 if (verbose) {
@@ -30,6 +33,7 @@ public class Benchmark {
         double convertedToSeconds = (double) timeElapsed / 1_000_000_000;
         System.out.printf("Evaluated %d equations in %f seconds. (%fs/equation)%n", numOfEquations, convertedToSeconds, convertedToSeconds / numOfEquations);
     }
+
 
     private static String generateRandomEquation(int depth) {
         if (depth > 3) {

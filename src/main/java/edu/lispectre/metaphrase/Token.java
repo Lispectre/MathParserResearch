@@ -2,7 +2,6 @@ package edu.lispectre.metaphrase;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.math.RoundingMode;
 
 import static ch.obermuhlner.math.big.BigDecimalMath.pow;
 
@@ -12,7 +11,7 @@ public abstract class Token {
     Operator operator;
     BigDecimal val;
     TokenType type;
-
+    MathContext mc;
     public abstract BigDecimal eval();
 
     public abstract void changeValue(BigDecimal val);
@@ -29,18 +28,19 @@ public abstract class Token {
 }
 
 class OperatorToken extends Token {
-    // TODO: make the below customizable by Tokenizer creating the token and the constructor for this
-    private static final MathContext mc = new MathContext(100, RoundingMode.HALF_UP);
 
-    OperatorToken(Operator op){
+    OperatorToken(Operator op, MathContext mc) {
         this.operator = op;
         this.type = TokenType.OPERATOR;
+        this.mc = mc;
     }
-    OperatorToken(Operator op, Token left, Token right){
+
+    OperatorToken(Operator op, Token left, Token right, MathContext mc) {
         this.operator = op;
         this.left = left;
         this.right = right;
         this.type = TokenType.OPERATOR;
+        this.mc = mc;
     }
 
     public BigDecimal eval() {
@@ -71,8 +71,9 @@ class ValueToken extends Token {
         this.type = TokenType.VALUE;
     }
 
-    ValueToken(String val) {
-        this.val = new BigDecimal(val);
+    ValueToken(String val, MathContext mc) {
+        this.mc = mc;
+        this.val = new BigDecimal(val, mc);
         this.type = TokenType.VALUE;
     }
 
@@ -93,8 +94,9 @@ class ValueToken extends Token {
 class VariableToken extends Token {
     final String variableIdentifier;
 
-    VariableToken(String variableIdentifier){
+    VariableToken(String variableIdentifier, MathContext mc) {
         this.variableIdentifier = variableIdentifier;
+        this.mc = mc;
         this.type = TokenType.VARIABLE;
     }
 
@@ -109,7 +111,7 @@ class VariableToken extends Token {
     }
 
     public void changeValue(String val) {
-        this.val = new BigDecimal(val);
+        this.val = new BigDecimal(val, mc);
     }
     @Override
     public String toString(){

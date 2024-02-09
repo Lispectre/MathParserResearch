@@ -32,60 +32,60 @@ class ParserTest {
     @Test
     void parseSimple() {
         tokenizer.tokenizeEquation(simpleEquation);
-        assertEquals(new BigDecimal("0"), parseTokens(tokenizer.getTokens()).eval());
+        assertEquals(new BigDecimal("0"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
     void parseSimpleExponent() {
         tokenizer.tokenizeEquation(simpleExponentEquation);
-        assertEquals(new BigDecimal("25"), parseTokens(tokenizer.getTokens()).eval());
+        assertEquals(new BigDecimal("25"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
     void parseSubtractingNegativeNumber() {
         tokenizer.tokenizeEquation(subtractingNegativeNumberEquation);
-        assertEquals(new BigDecimal("12.0"), parseTokens(tokenizer.getTokens()).eval());
+        assertEquals(new BigDecimal("12.0"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
     void parseSimpleDecimals() {
         tokenizer.tokenizeEquation(simpleWithDecimalsEquation);
-        assertEquals(new BigDecimal("21.55", mc), parseTokens(tokenizer.getTokens()).eval());
+        assertEquals(new BigDecimal("21.55", mc), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
     void parseDiffPrecedences() {
         tokenizer.tokenizeEquation(differentiatingPrecedencesEquation);
-        assertEquals(new BigDecimal("389.4"), parseTokens(tokenizer.getTokens()).eval());
+        assertEquals(new BigDecimal("389.4"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
     void parseParentheses(){
         tokenizer.tokenizeEquation(oneParenthesisEquation);
-        assertEquals(new BigDecimal("64.0"), parseTokens(tokenizer.getTokens()).eval());
+        assertEquals(new BigDecimal("64.0"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
     @Test
     void parseMultipleParentheses(){
         tokenizer.tokenizeEquation(multipleParenthesesEquation);
-        assertEquals(new BigDecimal("0.527", mc), parseTokens(tokenizer.getTokens()).eval());
+        assertEquals(new BigDecimal("0.527", mc), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
     @Test
     void parseNestedParentheses() {
         tokenizer.tokenizeEquation(nestedParenthesesEquation);
-        assertEquals(new BigDecimal("-16.0"), parseTokens(tokenizer.getTokens()).eval());
+        assertEquals(new BigDecimal("-16.0"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
     void parseAReallyLongAndUnnecessarilyComplicatedEquation() {
         tokenizer.tokenizeEquation(aReallyLongAndUnnecessarilyComplicatedJustLikeThisVariableNameEquation);
-        assertEquals(new BigDecimal("-6255.1865"), parseTokens(tokenizer.getTokens()).eval());
+        assertEquals(new BigDecimal("-6255.1865"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
     void parseOneKnownVariable() {
         tokenizer.tokenizeEquation(oneVariableEquation);
         tokenizer.changeValueOfVariable("x", new BigDecimal("2.0"));
-        assertEquals(new BigDecimal("32.0"), parseTokens(tokenizer.getTokens()).eval());
+        assertEquals(new BigDecimal("32.0"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
@@ -94,7 +94,7 @@ class ParserTest {
         String[] variables = {"x", "y", "z"};
         BigDecimal[] values = {new BigDecimal("5.0"), new BigDecimal("2.3"), new BigDecimal("10.0")};
         tokenizer.changeValuesOfVariables(variables, values);
-        assertEquals(new BigDecimal("14.018", mc), parseTokens(tokenizer.getTokens()).eval());
+        assertEquals(new BigDecimal("14.018", mc), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
@@ -105,7 +105,7 @@ class ParserTest {
         for (String variable : tokenizer.getVariables().keySet()) {
             tokenizer.changeValueOfVariable(variable, preparedValues[valuesPointer++]);
         }
-        assertEquals(new BigDecimal("32.0"), parseTokens(tokenizer.getTokens()).eval());
+        assertEquals(new BigDecimal("32.0"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
@@ -116,6 +116,6 @@ class ParserTest {
         for (String variable : tokenizer.getVariables().keySet()) {
             tokenizer.changeValueOfVariable(variable, preparedValues[valuesPointer++]);
         }
-        assertEquals(new BigDecimal("14.018", mc), parseTokens(tokenizer.getTokens()).eval());
+        assertEquals(new BigDecimal("14.018", mc), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 }
