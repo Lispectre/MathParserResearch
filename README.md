@@ -9,12 +9,16 @@ Currently running the main class brings up a REPL, which can be used for enterin
 In code:
 ```java
 String equation = "((3 - 8 / (1 - 10 * (5)) * 4) / 3) * 8 / 5 / 1";
-Tokenizer tokenizer = new Tokenizer(equation);
-Token topOfAST = Parser.parseTokens(tokenizer.getTokens());
-topOfAST.eval(); // returns 1.9482993197278913
+int wantedDecimalPlaces = 30;
+Tokenizer tokenizer = new Tokenizer(equation, wantedDecimalPlaces);
+Token topOfAST = Parser.parseTokens(tokenizer.getTokens(), tokenizer.getMathContext());
+topOfAST.
+
+eval(); // returns BigDecimal: "1.94829931946666666666666666667"
 ```
 ## To Dos
-- BigDecimal instead of Doubles for accuracy
+
+- ~~BigDecimal instead of Doubles for accuracy~~ (Done)
 - more error prone to unorthodox equations (e.g. "2---1" could be evaluated as "2-(-(-1))")
 - more operators
 - trigonometric functions support
