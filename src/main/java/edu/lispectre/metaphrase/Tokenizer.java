@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 /**
  * Equation tokenizer. Holds the tokens and variable info for one equation at the time. The tokenizer can be initialized
- * with an equation ({@link #Tokenizer(String)}  Tokenizer}. The equation can be passed or changed with
+ * with an equation ({@link #Tokenizer(String)}) or the equation can be passed or changed with
  * {@link #tokenizeEquation(String)} method.
  */
 public class Tokenizer {
