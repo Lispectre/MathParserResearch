@@ -9,9 +9,7 @@ import static edu.lispectre.metaphrase.Parser.parseTokens;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ParserTest {
-    // FIXME: the expected values are too imprecise right now
-
-    final MathContext mc = new MathContext(100);
+    final MathContext mc = new MathContext(10);
 
     final String simpleEquation = "1+2-3";
     final String simpleExponentEquation = "5^2";
@@ -62,30 +60,30 @@ class ParserTest {
     @Test
     void parseParentheses(){
         tokenizer.tokenizeEquation(oneParenthesisEquation);
-        assertEquals(new BigDecimal("64.0"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
+        assertEquals(new BigDecimal("64"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
     @Test
     void parseMultipleParentheses(){
         tokenizer.tokenizeEquation(multipleParenthesesEquation);
-        assertEquals(new BigDecimal("0.527", mc), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
+        assertEquals(new BigDecimal("0.5277777778", mc), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
     @Test
     void parseNestedParentheses() {
         tokenizer.tokenizeEquation(nestedParenthesesEquation);
-        assertEquals(new BigDecimal("-16.0"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
+        assertEquals(new BigDecimal("-16"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
     void parseAReallyLongAndUnnecessarilyComplicatedEquation() {
         tokenizer.tokenizeEquation(aReallyLongAndUnnecessarilyComplicatedJustLikeThisVariableNameEquation);
-        assertEquals(new BigDecimal("-6255.1865"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
+        assertEquals(new BigDecimal("-6255.186584"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
     void parseOneKnownVariable() {
         tokenizer.tokenizeEquation(oneVariableEquation);
         tokenizer.changeValueOfVariable("x", new BigDecimal("2.0"));
-        assertEquals(new BigDecimal("32.0"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
+        assertEquals(new BigDecimal("32"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
@@ -94,7 +92,7 @@ class ParserTest {
         String[] variables = {"x", "y", "z"};
         BigDecimal[] values = {new BigDecimal("5.0"), new BigDecimal("2.3"), new BigDecimal("10.0")};
         tokenizer.changeValuesOfVariables(variables, values);
-        assertEquals(new BigDecimal("14.018", mc), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
+        assertEquals(new BigDecimal("14.01869159", mc), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
@@ -105,7 +103,7 @@ class ParserTest {
         for (String variable : tokenizer.getVariables().keySet()) {
             tokenizer.changeValueOfVariable(variable, preparedValues[valuesPointer++]);
         }
-        assertEquals(new BigDecimal("32.0"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
+        assertEquals(new BigDecimal("32"), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 
     @Test
@@ -116,6 +114,6 @@ class ParserTest {
         for (String variable : tokenizer.getVariables().keySet()) {
             tokenizer.changeValueOfVariable(variable, preparedValues[valuesPointer++]);
         }
-        assertEquals(new BigDecimal("14.018", mc), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
+        assertEquals(new BigDecimal("14.01869159", mc), parseTokens(tokenizer.getTokens(), tokenizer.getMathContext()).eval());
     }
 }
