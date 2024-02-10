@@ -38,6 +38,82 @@ public class Tokenizer {
     }
 
     /**
+     * Tokenizes the equation.
+     * <p>The corresponding tokens are put in {@link #unparsedTokens}, which can be accessed using the {@link #getTokens()} method.
+     * Beware, that when tokenizing an equation, tokens and variables of the previous one get erased.
+     *
+     * @param equation          equation to create tokens of
+     * @param DESIRED_PRECISION the amount of decimal places
+     * @throws IllegalArgumentException if the DESIRED_PRECISION param is set to zero or lower
+     */
+    public void tokenizeEquation(String equation, final int DESIRED_PRECISION) {
+        final Matcher matcher = tokenizingRegEx.matcher(equation);
+        final Matcher nestedMatcher = nestedEquationRegEx.matcher(equation);
+        final ArrayList<String> matches = new ArrayList<>();
+        this.mathcontext = new MathContext(DESIRED_PRECISION);
+
+        unparsedTokens.clear();
+        variableAccess.clear();
+
+        while (matcher.find()) {
+            String match = matcher.group();
+            matches.add(match);
+        }
+
+        for (int index = 0; index < matches.size(); index++) {
+            String symbol = matches.get(index);
+            Token token;
+            switch (symbol) {
+                case "(":
+                    if (!nestedMatcher.find()) {
+                        throw new RuntimeException("Parentheses error - unmatched open parenthesis.");
+                    }
+                    String nestedEquation = nestedEquation(matches, index);
+                    Tokenizer nestedEquationTokenizer = new Tokenizer(nestedEquation);
+                    ArrayList<Token> nestedEquationTokens = nestedEquationTokenizer.getTokens();
+                    variableAccess.putAll(nestedEquationTokenizer.getVariables());
+                    token = Parser.parseTokens(nestedEquationTokens, this.mathcontext);
+                    index += movePointerAfterNestedEquation(matches, index + 1);
+                    break;
+                case ")":
+                    throw new RuntimeException("Parentheses error - unmatched closing parenthesis.");
+                case "^":
+                    token = new OperatorToken(Operator.EXPONENT, this.mathcontext);
+                    break;
+                case "*":
+                    token = new OperatorToken(Operator.MULTIPLICATION, this.mathcontext);
+                    break;
+                case "/":
+                    token = new OperatorToken(Operator.DIVISION, this.mathcontext);
+                    break;
+                case "+":
+                    token = new OperatorToken(Operator.ADDITION, this.mathcontext);
+                    break;
+                case "-":
+                    if (index == 0 || operators.contains(matches.get(index - 1))) {
+                        token = new OperatorToken(Operator.UNARYMINUS, this.mathcontext);
+                    } else {
+                        token = new OperatorToken(Operator.SUBTRACTION, this.mathcontext);
+                    }
+                    break;
+                default:
+                    if (isNumericRegEx.matcher(symbol).matches()) {
+                        token = new ValueToken(symbol, this.mathcontext);
+                    } else {
+                        if (!variableAccess.containsKey(symbol)) {
+                            token = new VariableToken(symbol, this.mathcontext);
+                            variableAccess.put(symbol, token);
+                        } else {
+                            token = variableAccess.get(symbol);
+                        }
+                    }
+                    break;
+            }
+            unparsedTokens.add(token);
+        }
+    }
+
+    /**
      * Method for extracting an equation in parentheses. This allows the code to recursively tokenize and parse the
      * inner equation instead of treating parentheses like tokens themselves.
      * @param matches symbols which are tokenized
@@ -89,82 +165,6 @@ public class Tokenizer {
         return i - index;
     }
 
-    /**
-     * Tokenizes the equation.
-     * <p>The corresponding tokens are put in {@link #unparsedTokens}, which can be accessed using the {@link #getTokens()} method.
-     * Beware, that when tokenizing an equation, tokens and variables of the previous one get erased.
-     *
-     * @param equation equation to create tokens of
-     * @param DESIRED_PRECISION the amount of decimal places
-     * @throws IllegalArgumentException if the DESIRED_PRECISION param is set to zero or lower
-     */
-    public void tokenizeEquation(String equation, final int DESIRED_PRECISION) {
-        final Matcher matcher = tokenizingRegEx.matcher(equation);
-        final Matcher nestedMatcher = nestedEquationRegEx.matcher(equation);
-        final ArrayList<String> matches = new ArrayList<>();
-        this.mathcontext = new MathContext(DESIRED_PRECISION);
-
-        unparsedTokens.clear();
-        variableAccess.clear();
-
-        while (matcher.find()) {
-            String match = matcher.group();
-            matches.add(match);
-        }
-
-        for (int index = 0; index < matches.size(); index++){
-            String symbol = matches.get(index);
-            Token token;
-            switch (symbol){
-                case "(":
-                    if (!nestedMatcher.find()) {
-                        throw new RuntimeException("Parentheses error - unmatched open parenthesis.");
-                    }
-                    String nestedEquation = nestedEquation(matches, index);
-                    Tokenizer nestedEquationTokenizer = new Tokenizer(nestedEquation);
-                    ArrayList<Token> nestedEquationTokens = nestedEquationTokenizer.getTokens();
-                    variableAccess.putAll(nestedEquationTokenizer.getVariables());
-                    token = Parser.parseTokens(nestedEquationTokens, this.mathcontext);
-                    index += movePointerAfterNestedEquation(matches, index+1);
-                    break;
-                case ")":
-                    throw new RuntimeException("Parentheses error - unmatched closing parenthesis.");
-                case "^":
-                    token = new OperatorToken(Operator.EXPONENT, this.mathcontext);
-                    break;
-                case "*":
-                    token = new OperatorToken(Operator.MULTIPLICATION, this.mathcontext);
-                    break;
-                case "/":
-                    token = new OperatorToken(Operator.DIVISION, this.mathcontext);
-                    break;
-                case "+":
-                    token = new OperatorToken(Operator.ADDITION, this.mathcontext);
-                    break;
-                case "-":
-                    if (index == 0 || operators.contains(matches.get(index - 1))) {
-                        token = new OperatorToken(Operator.UNARYMINUS, this.mathcontext);
-                    } else {
-                        token = new OperatorToken(Operator.SUBTRACTION, this.mathcontext);
-                    }
-                    break;
-                default:
-                    if (isNumericRegEx.matcher(symbol).matches()){
-                        token = new ValueToken(symbol, this.mathcontext);
-                    }
-                    else {
-                        if (!variableAccess.containsKey(symbol)) {
-                            token = new VariableToken(symbol, this.mathcontext);
-                            variableAccess.put(symbol, token);
-                        } else {
-                            token = variableAccess.get(symbol);
-                        }
-                    }
-                    break;
-            }
-            unparsedTokens.add(token);
-        }
-    }
 
     /**
      * Tokenizes the equation, making the tokens accurate up to a 10th decimal place.
