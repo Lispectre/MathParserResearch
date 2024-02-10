@@ -114,6 +114,18 @@ public class Tokenizer {
     }
 
     /**
+     * Tokenizes the equation, making the tokens accurate up to a 10th decimal place.
+     * <p>The corresponding tokens are put in {@link #unparsedTokens}, which can be accessed using the {@link #getTokens()} method.
+     * Beware, that when tokenizing an equation, tokens and variables of the previous one get erased.
+     *
+     * @param equation equation to create tokens of
+     */
+    public void tokenizeEquation(String equation) {
+        this.tokenizeEquation(equation, 10);
+    }
+
+
+    /**
      * Method for extracting an equation in parentheses. This allows the code to recursively tokenize and parse the
      * inner equation instead of treating parentheses like tokens themselves.
      * @param matches symbols which are tokenized
@@ -163,18 +175,6 @@ public class Tokenizer {
             }
         }
         return i - index;
-    }
-
-
-    /**
-     * Tokenizes the equation, making the tokens accurate up to a 10th decimal place.
-     * <p>The corresponding tokens are put in {@link #unparsedTokens}, which can be accessed using the {@link #getTokens()} method.
-     * Beware, that when tokenizing an equation, tokens and variables of the previous one get erased.
-     *
-     * @param equation equation to create tokens of
-     */
-    public void tokenizeEquation(String equation) {
-        this.tokenizeEquation(equation, 10);
     }
 
     /**
